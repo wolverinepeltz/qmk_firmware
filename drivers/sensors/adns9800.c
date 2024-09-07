@@ -77,7 +77,9 @@
 #define MSB1              0x80
 // clang-format on
 
-void adns9800_spi_start(void) { spi_start(ADNS9800_CS_PIN, false, ADNS9800_SPI_MODE, ADNS9800_SPI_DIVISOR); }
+void adns9800_spi_start(void) {
+    spi_start(ADNS9800_CS_PIN, false, ADNS9800_SPI_MODE, ADNS9800_SPI_DIVISOR);
+}
 
 void adns9800_write(uint8_t reg_addr, uint8_t data) {
     adns9800_spi_start();
@@ -97,8 +99,8 @@ uint8_t adns9800_read(uint8_t reg_addr) {
     return data;
 }
 
-void adns9800_init() {
-    setPinOutput(ADNS9800_CS_PIN);
+void adns9800_init(void) {
+    gpio_set_pin_output(ADNS9800_CS_PIN);
 
     spi_init();
 
@@ -113,6 +115,7 @@ void adns9800_init() {
     adns9800_read(REG_Delta_Y_L);
     adns9800_read(REG_Delta_Y_H);
 
+#ifdef ADNS9800_UPLOAD_SROM
     // upload firmware
 
     // 3k firmware mode
@@ -135,16 +138,24 @@ void adns9800_init() {
     wait_us(15);
 
     // send all bytes of the firmware
-    unsigned char c;
-    for (int i = 0; i < FIRMWARE_LENGTH; i++) {
-        c = (unsigned char)pgm_read_byte(adns9800_firmware_data + i);
-        spi_write(c);
+    for (uint16_t i = 0; i < FIRMWARE_LENGTH; i++) {
+        spi_write(pgm_read_byte(firmware_data + i));
         wait_us(15);
     }
 
     spi_stop();
 
     wait_ms(10);
+#else
+    // write reset value to REG_Configuration_IV
+    adns9800_write(REG_Configuration_IV, 0x0);
+
+    // write reset value to REG_SROM_Enable
+    adns9800_write(REG_SROM_Enable, 0x0);
+
+    // wait a frame
+    wait_ms(10);
+#endif
 
     // enable laser
     uint8_t laser_ctrl0 = adns9800_read(REG_LASER_CTRL0);
@@ -154,8 +165,8 @@ void adns9800_init() {
 }
 
 config_adns9800_t adns9800_get_config(void) {
-    uint8_t config_1 = adns9800_read(REG_Configuration_I);
-    return (config_adns9800_t){(config_1 & 0xFF) * CPI_STEP};
+    uint8_t cpival = adns9800_read(REG_Configuration_I);
+    return (config_adns9800_t){(cpival & 0xFF) * CPI_STEP};
 }
 
 void adns9800_set_config(config_adns9800_t config) {
@@ -164,8 +175,8 @@ void adns9800_set_config(config_adns9800_t config) {
 }
 
 uint16_t adns9800_get_cpi(void) {
-    uint8_t config_1 = adns9800_read(REG_Configuration_I);
-    return (uint16_t){(config_1 & 0xFF) * CPI_STEP};
+    uint8_t cpival = adns9800_read(REG_Configuration_I);
+    return (uint16_t)(cpival & 0xFF) * CPI_STEP;
 }
 
 void adns9800_set_cpi(uint16_t cpi) {
@@ -184,7 +195,7 @@ static int16_t convertDeltaToInt(uint8_t high, uint8_t low) {
 }
 
 report_adns9800_t adns9800_get_report(void) {
-    report_adns9800_t report = {0, 0};
+    report_adns9800_t report = {0};
 
     adns9800_spi_start();
 
