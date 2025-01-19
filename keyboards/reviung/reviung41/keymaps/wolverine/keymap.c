@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include "tap_dance.h"
 
 // Defines names for use in layer keycodes and the keymap
 enum layer_names {
@@ -105,7 +106,7 @@ enum custom_keycodes {
 #define FILE_E LCTL(LSFT(KC_1))
 
 #define TAP_HOLD(_func_, _tap_, _hold_) \
-void _func_(qk_tap_dance_state_t *state, void *user_data) { \
+void _func_(tap_dance_state_t *state, void *user_data) { \
   td_state = cur_dance(state);  \
   switch (td_state) {  \
     case SINGLE_TAP:  \
@@ -130,23 +131,23 @@ typedef enum {
 static td_state_t td_state;
 
 // function to track the current tapdance state
-int cur_dance (qk_tap_dance_state_t *state);
+int cur_dance (tap_dance_state_t *state);
 
 // `finished` function for each tapdance keycode
 // `finished` function for each tapdance keycode
-void d_copy(qk_tap_dance_state_t *state, void *user_data);
-void s_copy(qk_tap_dance_state_t *state, void *user_data);
-void e_copy(qk_tap_dance_state_t *state, void *user_data);
-void f_paste(qk_tap_dance_state_t *state, void *user_data);
-void f_find(qk_tap_dance_state_t *state, void *user_data);
-void t_paste(qk_tap_dance_state_t *state, void *user_data);
-void a_paste(qk_tap_dance_state_t *state, void *user_data);
-void a_undo(qk_tap_dance_state_t *state, void *user_data);
-void s_cut(qk_tap_dance_state_t *state, void *user_data);
-void r_cut(qk_tap_dance_state_t *state, void *user_data);
-void n_cut(qk_tap_dance_state_t *state, void *user_data);
-void g_bold(qk_tap_dance_state_t *state, void *user_data);
-void qt_bold(qk_tap_dance_state_t *state, void *user_data);
+void d_copy(tap_dance_state_t *state, void *user_data);
+void s_copy(tap_dance_state_t *state, void *user_data);
+void e_copy(tap_dance_state_t *state, void *user_data);
+void f_paste(tap_dance_state_t *state, void *user_data);
+void f_find(tap_dance_state_t *state, void *user_data);
+void t_paste(tap_dance_state_t *state, void *user_data);
+void a_paste(tap_dance_state_t *state, void *user_data);
+void a_undo(tap_dance_state_t *state, void *user_data);
+void s_cut(tap_dance_state_t *state, void *user_data);
+void r_cut(tap_dance_state_t *state, void *user_data);
+void n_cut(tap_dance_state_t *state, void *user_data);
+void g_bold(tap_dance_state_t *state, void *user_data);
+void qt_bold(tap_dance_state_t *state, void *user_data);
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	
@@ -245,7 +246,7 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
 }
 
 // track the tapdance state to return
-int cur_dance (qk_tap_dance_state_t *state) {
+int cur_dance (tap_dance_state_t *state) {
   if (state->count == 1) {
     if (state->interrupted || !state->pressed) {
         return SINGLE_TAP; 
