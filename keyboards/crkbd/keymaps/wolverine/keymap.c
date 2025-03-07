@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 enum layer_names {
   _COLEMAK,
   _QWERTY,
-  _MTGAP,
   _SYM,
   _NAV
 };
@@ -45,10 +44,11 @@ enum {
 enum custom_keycodes {
 		COLEMAK = SAFE_RANGE,
 		QWERTY,
-		MTGAP
+		KC_DTTM
 };
 
 #define OSL_NAV OSL(_NAV)
+#define TT_NAV TT(_NAV)
 #define PREV_WD RCTL(KC_LEFT)
 #define NEXT_WD RCTL(KC_RIGHT)
 #define PREV_PAR RCTL(KC_UP)
@@ -109,7 +109,7 @@ enum custom_keycodes {
 #define FILE_E LCTL(LSFT(KC_1))
 
 #define TAP_HOLD(_func_, _tap_, _hold_) \
-void _func_(qk_tap_dance_state_t *state, void *user_data) { \
+void _func_(tap_dance_state_t *state, void *user_data) { \
   td_state = cur_dance(state);  \
   switch (td_state) {  \
     case SINGLE_TAP:  \
@@ -134,61 +134,48 @@ typedef enum {
 static td_state_t td_state;
 
 // function to track the current tapdance state
-int cur_dance (qk_tap_dance_state_t *state);
+int cur_dance (tap_dance_state_t *state);
 
 // `finished` function for each tapdance keycode
 // `finished` function for each tapdance keycode
-void d_copy(qk_tap_dance_state_t *state, void *user_data);
-void s_copy(qk_tap_dance_state_t *state, void *user_data);
-void e_copy(qk_tap_dance_state_t *state, void *user_data);
-void f_paste(qk_tap_dance_state_t *state, void *user_data);
-void f_find(qk_tap_dance_state_t *state, void *user_data);
-void t_paste(qk_tap_dance_state_t *state, void *user_data);
-void a_paste(qk_tap_dance_state_t *state, void *user_data);
-void a_undo(qk_tap_dance_state_t *state, void *user_data);
-void s_cut(qk_tap_dance_state_t *state, void *user_data);
-void r_cut(qk_tap_dance_state_t *state, void *user_data);
-void n_cut(qk_tap_dance_state_t *state, void *user_data);
-void g_bold(qk_tap_dance_state_t *state, void *user_data);
-void qt_bold(qk_tap_dance_state_t *state, void *user_data);
+void d_copy(tap_dance_state_t *state, void *user_data);
+void s_copy(tap_dance_state_t *state, void *user_data);
+void e_copy(tap_dance_state_t *state, void *user_data);
+void f_paste(tap_dance_state_t *state, void *user_data);
+void f_find(tap_dance_state_t *state, void *user_data);
+void t_paste(tap_dance_state_t *state, void *user_data);
+void a_paste(tap_dance_state_t *state, void *user_data);
+void a_undo(tap_dance_state_t *state, void *user_data);
+void s_cut(tap_dance_state_t *state, void *user_data);
+void r_cut(tap_dance_state_t *state, void *user_data);
+void n_cut(tap_dance_state_t *state, void *user_data);
+void g_bold(tap_dance_state_t *state, void *user_data);
+void qt_bold(tap_dance_state_t *state, void *user_data);
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	
   [_COLEMAK] = LAYOUT( \
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       KC_GESC,    KC_Q,    KC_W,    FFIND,    KC_P,    KC_B,                         KC_J,    KC_L,    KC_U,    KC_Y, KC_QUOT, GUI_PSCR,
+       QK_GESC,    KC_Q,    KC_W,    FFIND,    KC_P,    KC_B,                         KC_J,    KC_L,    KC_U,    KC_Y, KC_QUOT, GUI_PSCR,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       LCA_TAB,    KC_A,    RCUT,    SCOPY,    TPASTE,    GBOLD,                         KC_M,    KC_N,    KC_E,    KC_I,    KC_O, CTL_BSP,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       OSL_NAV,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                                   KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, OSM_CS,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          OSM_CTRL,   SYM_DEL, KC_SFTENT,    SFT_SPC,   SYM_BSP, KC_LALT 
+                                          OSM_CTRL,   SYM_DEL, SC_SENT,    SFT_SPC,   SYM_BSP, KC_LALT 
                                       //`--------------------------'  `--------------------------'
   ),
   [_QWERTY] = LAYOUT(
   //|-----------------------------------------------------|                    |-----------------------------------------------------|
-     KC_GESC,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    GUI_PSCR,
+     QK_GESC,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    GUI_PSCR,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
      LCA_TAB,  KC_A,    SCUT,    DCOPY,    FPASTE,    GBOLD,                         KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, CTL_BSP,
   //---------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
      OSL_NAV, KC_Z,    KC_X,    KC_C,    KC_V, KC_B,                         KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, OSM_CS,
   //---------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                         OSM_CTRL, SYM_DEL,   KC_SFTENT,  SFT_SPC,  SYM_BSP, KC_LALT
+                                         OSM_CTRL, SYM_DEL,   SC_SENT,  SFT_SPC,  SYM_BSP, KC_LALT
                                       //|--------------------------|  |--------------------------|
   ),
-  
-    [_MTGAP] = LAYOUT(
-  //|-----------------------------------------------------|                    |-----------------------------------------------------|
-     KC_GESC,  KC_Y,    KC_P,    KC_O,    KC_U,    KC_J,                         KC_K,    KC_D,    KC_L,    KC_C,    KC_W,    GUI_PSCR,
-  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-     LCA_TAB,  KC_I,    NCUT,    ECOPY,    APASTE, QTBOLD,                      KC_M,    KC_H,    KC_T,    KC_S,    KC_R, CTL_BSP,
-  //---------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-     OSL_NAV, KC_Q,    KC_Z,    KC_COMM,    KC_DOT, KC_SLSH,                              KC_B,    KC_F,    KC_G,    KC_V,    KC_X, OSM_CS,
-  //---------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                         OSM_CTRL, SYM_DEL,   KC_SFTENT,  SFT_SPC,  SYM_BSP, KC_LALT
-                                      //|--------------------------|  |--------------------------|
-  ),
-
 
   
     [_SYM] = LAYOUT(
@@ -203,19 +190,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                       //|--------------------------|  |--------------------------|
   ),
   
-  
-  [_NAV] = LAYOUT(
+    [_NAV] = LAYOUT(
   //|-----------------------------------------------------|                    |-----------------------------------------------------|
-     KC_TRNS,   FULL_SCRN,   EXT_MODE,   KC_WH_U, RECALC_XLS, TGL_ABSREF,          KC_PGUP, PREV_WD, KC_UP,   NEXT_WD, KC_HOME, KC_TRNS, 
+     COLEMAK,  KC_HOME, PREV_WD,   KC_UP,   NEXT_WD,  KC_PGUP,                   KC_SLSH, KC_1, KC_2, KC_3, KC_MINS, QK_BOOT, 
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-     KC_TRNS,   REFRESH,  KC_WH_L,   KC_WH_D, KC_WH_R, KC_VOLU,                    KC_PGDN, KC_LEFT, KC_DOWN, KC_RGHT, KC_END, KC_TRNS, 
+     KC_CAPS,   KC_END,  KC_LEFT,   KC_DOWN, KC_RGHT,  KC_PGDN,                   KC_ASTR, KC_4, KC_5, KC_6, KC_PLUS, KC_BSPC, 
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-	 KC_TRNS,   SPELL,    KC_MPRV,  KC_MPLY,KC_MNXT, KC_VOLD,                      KC_ESC, PREV_PAR, OSM_ALT, NEXT_PAR,KC_TRNS,  FILE_E, 
+	 KC_TRNS,  KC_F4,   PREV_PAR,  KC_F5,   NEXT_PAR, KC_DTTM,                     KC_TAB,  KC_7, KC_8, KC_9, KC_EQL,  SC_SENT,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          QWERTY, COLEMAK, MTGAP,       KC_CAPS, KC_TRNS, CAD
+                                          OSM_CTRL, OSM_ALT, SFT_SPC,       KC_COMM, KC_0, KC_DOT
                                       //|--------------------------|  |--------------------------|
 									  
   )
+  
 };
 
 
@@ -276,15 +263,11 @@ void oled_render_layer_state(void) {
         case _COLEMAK:
             oled_write_P(PSTR("Colemak"), false);
             break;
-		case _MTGAP:
-            oled_write_P(PSTR("MTGAP"), false);
-            break;
     }
 	
 	 switch (get_highest_layer(layer_state)) {
         case _QWERTY: 
-		case _COLEMAK:
-		case _MTGAP:		
+		case _COLEMAK:	
             oled_write_ln_P(PSTR(" / Base"), false);
             break;
         case _NAV:
@@ -418,26 +401,46 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 set_single_persistent_default_layer(_QWERTY); 
             }
             return false;
-        case COLEMAK:
+      case COLEMAK:
             if (record->event.pressed) {
                 set_single_persistent_default_layer(_COLEMAK); 
             }
             return false;  
-		case MTGAP:
+	
+      case KC_DTTM:
             if (record->event.pressed) {
-                set_single_persistent_default_layer(_MTGAP); 
+                // Current date (Ctrl + ;)
+                register_code(KC_LCTL);
+                register_code(KC_SCLN);
+                unregister_code(KC_SCLN);
+                unregister_code(KC_LCTL);
+                
+                // Space
+                register_code(KC_SPC);
+                unregister_code(KC_SPC);
+                
+                // Current time (Ctrl + Shift + ;)
+                register_code(KC_LCTL);
+                register_code(KC_LSFT);
+                register_code(KC_SCLN);
+                unregister_code(KC_SCLN);
+                unregister_code(KC_LSFT);
+                unregister_code(KC_LCTL);
+                
+                return false;
             }
-            return false; 
   }
   return true;
 }
 
-
-
-bool get_ignore_mod_tap_interrupt(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case SFT_SPC:
-            return true;
+bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
+    switch(keycode) {
+        case QK_MOD_TAP ... QK_MOD_TAP_MAX:
+            if (keycode == SFT_SPC) {
+                return false;
+            } else {
+                return true;
+            }
         default:
             return false;
     }
@@ -448,10 +451,10 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
         case DCOPY:
 		case SCOPY:
 		case ECOPY:
-		case FPASTE:
+//		case FPASTE:
 		case FFIND:
-		case TPASTE:
-		case APASTE:
+//		case TPASTE:
+//		case APASTE:
 		case SCUT:
 		case RCUT:
 		case NCUT:
@@ -464,8 +467,17 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
+uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case SYM_DEL:
+            return 0;
+        default:
+            return QUICK_TAP_TERM;
+    }
+}
+
 // track the tapdance state to return
-int cur_dance (qk_tap_dance_state_t *state) {
+int cur_dance (tap_dance_state_t *state) {
   if (state->count == 1) {
     if (state->interrupted || !state->pressed) {
         return SINGLE_TAP; 
@@ -497,7 +509,7 @@ TAP_HOLD(g_bold,KC_G, KC_B);
 TAP_HOLD(qt_bold,KC_QUOT, KC_B);
 
 
-qk_tap_dance_action_t tap_dance_actions[] = {
+tap_dance_action_t tap_dance_actions[] = {
 	[S_CUT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,s_cut, NULL),
 	[R_CUT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,r_cut, NULL),
 	[N_CUT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,n_cut, NULL),
